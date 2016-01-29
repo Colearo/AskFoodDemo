@@ -15,4 +15,5 @@ struct Color {
     static let white = UIColor.whiteColor()
     static let clear = UIColor.clearColor()
     static let black = UIColor.blackColor()
+    static let soft = UIColor(red: 175/255, green: 181/255, blue: 176/255, alpha: 1.0)
 }

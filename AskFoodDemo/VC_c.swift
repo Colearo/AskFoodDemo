@@ -13,5 +13,26 @@ class VC_c: UIViewController {
     @IBAction func ClickBtn(sender: UIButton) {
         self.navigationController?.popToRootViewControllerAnimated(true)
     }
-
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let logos=UIImageView(image:UIImage(named:"logos"))
+        let Inf_btn=UIButton(frame: CGRectMake(30,300,320,50))
+        let About_btn=UIButton(frame: CGRectMake(30,355,320,50))
+        logos.frame=CGRectMake(30,100,320,200)
+        Inf_btn.layer.cornerRadius=10
+        Inf_btn.layer.borderColor=Color.white.CGColor
+        Inf_btn.layer.borderWidth=1.5
+        Inf_btn.setTitle("个人信息", forState: .Normal)
+        Inf_btn.setTitleColor(Color.white, forState: .Normal)
+        Inf_btn.setTitleColor(Color.orange, forState: .Highlighted)
+        About_btn.layer.cornerRadius=10
+        About_btn.layer.borderColor=Color.white.CGColor
+        About_btn.layer.borderWidth=1.5
+        About_btn.setTitle("关于我们", forState: .Normal)
+        About_btn.setTitleColor(Color.white, forState: .Normal)
+        About_btn.setTitleColor(Color.orange, forState: .Highlighted)
+        self.view.addSubview(logos)
+        self.view.addSubview(Inf_btn)
+        self.view.addSubview(About_btn)
+    }
 }
