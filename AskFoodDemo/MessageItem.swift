@@ -92,10 +92,10 @@ class MessageItem {
     {
         var size = image.size
         //等比缩放
-        if (size.width > 180)
+        if (size.width > 140)
         {
-            size.height /= (size.width / 180);
-            size.width = 180;
+            size.height /= (size.width / 140);
+            size.width = 140;
         }
         let imageView = UIImageView(frame:CGRectMake(0, 0, size.width, size.height))
         imageView.image = image

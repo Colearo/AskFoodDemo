@@ -64,7 +64,7 @@ class CircleTransitionAnimatorPopA: NSObject, UIViewControllerAnimatedTransition
         //containerView!.addSubview(toViewController.view)
         containerView!.insertSubview(toView, aboveSubview: fromView)
         // 4
-        let circleMaskPathInitial = UIBezierPath(ovalInRect: button.frame)
+        let circleMaskPathInitial = UIBezierPath(ovalInRect: VC_A_Frame!)
         let extremePoint = CGPointMake(button.center.x, button.center.y - CGRectGetHeight(toView.bounds)) // need more research
         let radius = sqrt(extremePoint.x * extremePoint.x + extremePoint.y * extremePoint.y)
         let circleMaskPathFinal = UIBezierPath(ovalInRect: CGRectInset(button.frame, -radius, -radius))

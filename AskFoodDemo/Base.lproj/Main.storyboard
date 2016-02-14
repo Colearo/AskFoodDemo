@@ -44,7 +44,11 @@
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Srg-7m-Z6h" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <customObject id="gfi-lu-SmH" customClass="NavigationControllerDelegate" customModule="AskFoodDemo" customModuleProvider="target"/>
+                <customObject id="gfi-lu-SmH" customClass="NavigationControllerDelegate" customModule="AskFoodDemo" customModuleProvider="target">
+                    <connections>
+                        <outlet property="navigationController" destination="xfy-Uo-QSH" id="qeQ-Iw-SDi"/>
+                    </connections>
+                </customObject>
             </objects>
             <point key="canvasLocation" x="948" y="316"/>
         </scene>
@@ -277,11 +281,31 @@
                     </view>
                     <connections>
                         <outlet property="Button" destination="Pee-JW-09c" id="b0p-SK-8KI"/>
+                        <segue destination="vvo-E5-n7a" kind="show" identifier="toAbout" action="showDetailViewController:sender:" id="Gdn-LE-klI"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QtW-6W-CGc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2307" y="1727"/>
+        </scene>
+        <!--c s-->
+        <scene sceneID="2nM-rd-2sk">
+            <objects>
+                <viewController id="vvo-E5-n7a" customClass="VC_c_s" customModule="AskFoodDemo" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="CsD-29-i1B"/>
+                        <viewControllerLayoutGuide type="bottom" id="2qa-GU-DqZ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="uTq-3S-SXp">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.94509803920000002" green="0.2901960784" blue="0.20784313730000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <gestureRecognizers/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rqM-cr-zGd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2967" y="1727"/>
         </scene>
         <!--a-->
         <scene sceneID="ofx-v5-SGy">
@@ -312,12 +336,12 @@
                                     <action selector="ClickBtn:" destination="LMN-Cg-nXG" eventType="touchUpInside" id="btU-0s-rcU"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="c7U-4i-FXC">
+                            <textField hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="c7U-4i-FXC">
                                 <rect key="frame" x="20" y="38" width="136" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FyY-kP-1Fq">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FyY-kP-1Fq">
                                 <rect key="frame" x="203" y="38" width="46" height="30"/>
                                 <state key="normal" title="Button"/>
                                 <connections>

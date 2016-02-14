@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+var VC_A_Frame:CGRect?
 class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     var Chats:NSMutableArray!
     var tableView:TableView!
@@ -18,8 +18,10 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     let btn1:UIButton=UIButton(frame: CGRectMake(100,600,70,30))
     let btn2:UIButton=UIButton(frame: CGRectMake(220,600,70,30))
     let btn3:UIButton=UIButton(frame: CGRect.zero)
+    var count:Int=0
     @IBOutlet weak var Button: UIButton!
     @IBAction func ClickBtn(sender: UIButton) {
+        //BtnNo=1
         self.navigationController?.popToRootViewControllerAnimated(true)
     }
     @IBAction func testJust(sender: UIButton) {
@@ -28,6 +30,8 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        //BtnNo=0
+        VC_A_Frame = self.Button.frame
         self.setupChatTable()
         self.setupSendPanel()
         self.setupKeyboard()
@@ -45,30 +49,32 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         self.tableView!.registerClass(TableViewCell.self, forCellReuseIdentifier: "ChatCell")
         
         
-        me = UserInfo(name:"User" ,logo:("Me"))
+        me = UserInfo(name:"大C" ,logo:("Me"))
         you  = UserInfo(name:"Ask君", logo:("You"))
         
         
-        let first =  MessageItem(body:"嘿，这张照片咋样，我在泸沽湖拍的呢！红红火火恍恍惚惚红红火火", user:me,  date:NSDate(timeIntervalSinceNow:-600), mtype:ChatType.Mine)
+        //let first =  MessageItem(body:"嘿，这张照片咋样，我在泸沽湖拍的呢！红红火火恍恍惚惚红红火火", user:me,  date:NSDate(timeIntervalSinceNow:-600), mtype:ChatType.Mine)
         
         //let second =  MessageItem(image:UIImage(named:"button1")!,user:me, date:NSDate(timeIntervalSinceNow:-290), mtype:ChatType.Mine)
         
-        let third =  MessageItem(body:"太赞了，我也想去那看看呢！",user:you, date:NSDate(timeIntervalSinceNow:-60), mtype:ChatType.Someone)
+        //let third =  MessageItem(body:"太赞了，我也想去那看看呢！",user:you, date:NSDate(timeIntervalSinceNow:-60), mtype:ChatType.Someone)
         
-        let fouth =  MessageItem(body:"嗯，下次我们一起去吧！",user:me, date:NSDate(timeIntervalSinceNow:-20), mtype:ChatType.Mine)
+        //let fouth =  MessageItem(body:"嗯，下次我们一起去吧！",user:me, date:NSDate(timeIntervalSinceNow:-20), mtype:ChatType.Mine)
         
-        let fifth =  MessageItem(body:"好的，一定！",user:you, date:NSDate(timeIntervalSinceNow:0), mtype:ChatType.Someone)
+        //let fifth =  MessageItem(body:"好的，一定！",user:you, date:NSDate(timeIntervalSinceNow:0), mtype:ChatType.Someone)
         
-        let zero =  MessageItem(body:"最近去哪玩了？", user:you,  date:NSDate(timeIntervalSinceNow:-96400), mtype:ChatType.Someone)
+        //let zero =  MessageItem(body:"最近去哪玩了？", user:you,  date:NSDate(timeIntervalSinceNow:-96400), mtype:ChatType.Someone)
         
-        let zero1 =  MessageItem(body:"去了趟云南，明天发照片给你哈？", user:me,  date:NSDate(timeIntervalSinceNow:-86400), mtype:ChatType.Mine)
+        //let zero1 =  MessageItem(body:"去了趟云南，明天发照片给你哈？", user:me,  date:NSDate(timeIntervalSinceNow:-86400), mtype:ChatType.Mine)
         
         Chats = NSMutableArray()
-        Chats.addObjectsFromArray([first, third, fouth, fifth, zero, zero1])
-        
+        //Chats.addObjectsFromArray([first, third, fouth, fifth, zero, zero1])
+        let zero =  MessageItem(body:"\(me.username) 晚上好🌃", user:you,  date:NSDate(), mtype:ChatType.Someone)
+        Chats.addObject(zero)
         self.tableView.chatDataSource = self
         self.tableView.reloadData()
         self.view.addSubview(self.tableView)
+        self.animationLoad()
     }
     
     
@@ -179,6 +185,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     //弹出按钮动画
     func showButton(choice:[String])
     {
+        count++
         btn1.center.y=700
         btn2.center.y=700
         self.view.addSubview(btn1)
@@ -203,8 +210,8 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
             self.btn1.center.y+=120
             self.btn2.center.y+=120
             }, completion: {finished in
-                let make=MessageItem(body:"哈哈",user:self.you, date:NSDate(), mtype:.Someone)
-                self.Chats.addObject(make)
+                //let make=MessageItem(body:"哈哈",user:self.you, date:NSDate(), mtype:.Someone)
+                //self.Chats.addObject(make)
                 self.animationLoad()
                 self.btn1.removeFromSuperview()
                 self.btn2.removeFromSuperview()
@@ -233,6 +240,10 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         self.view.addSubview(labela)
         self.view.addSubview(labelb)
         self.view.addSubview(labelc)
+        let one = MessageItem(body: "又过去了美好的一天吧，今天的晚餐吃了吗", user: you, date: NSDate(), mtype: .Someone)
+        let two = MessageItem(body: "哦哦，知道了", user: you, date: NSDate(), mtype: .Someone)
+        let imaget = MessageItem(image: UIImage(named: "Protein")!, user: you, date: NSDate(), mtype: .Someone)
+        let three = MessageItem(body: "牛肉——蛋白质；看起来很丰盛哦，晚餐的卡路里和蛋白质都符合要求，也请多吃一些蔬菜哦", user: you, date: NSDate(), mtype: .Someone)
         UIView.animateWithDuration(0.1, delay: 0.0, options: .CurveLinear, animations: {
             labela.alpha=1.0
             }, completion: nil)
@@ -251,7 +262,23 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         UIView.animateWithDuration(0.5, delay: 0.7, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.1, options: [.AllowUserInteraction,.CurveEaseInOut], animations: {
             labelc.center.y-=8
             }, completion: { finished in
-                self.tableView.reloadData()
+                switch self.count{
+                case 1:
+                    self.Chats.addObject(one)
+                    self.tableView.reloadData()
+                    self.showButton(["嗯","没有💢"])
+                case 2:
+                    self.showEditer()
+                case 3:
+                    self.Chats.addObject(two)
+                    self.Chats.addObject(imaget)
+                    self.Chats.addObject(three)
+                    self.tableView.reloadData()
+                    self.showButton(["OK","为什么呢"])
+                default:
+                    self.showButton(["你好","晚上好"])
+                }
+                //self.tableView.reloadData()
                 labela.removeFromSuperview()
                 labelb.removeFromSuperview()
                 labelc.removeFromSuperview()
@@ -272,6 +299,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     }
     func showEditer()
     {
+        count++
         btn3.center.y=700
         btn3.sizeToFit()
         self.view.addSubview(btn3)

@@ -36,6 +36,9 @@
 		E43187F01C5A1C1F00F40BFE /* Exten_UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43187EF1C5A1C1F00F40BFE /* Exten_UIView.swift */; };
 		E43189AA1C5A7A6F00F40BFE /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E43189A51C5A7A4600F40BFE /* Charts.framework */; };
 		E43189AB1C5A7A6F00F40BFE /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E43189A51C5A7A4600F40BFE /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E4C71ED01C5E2B5500A6FEB6 /* Protein.pdf in Resources */ = {isa = PBXBuildFile; fileRef = E4C71ECF1C5E2B5500A6FEB6 /* Protein.pdf */; };
+		E4C71ED21C5E4A0F00A6FEB6 /* VC_c_s.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C71ED11C5E4A0F00A6FEB6 /* VC_c_s.swift */; };
+		E4EC222E1C5CDD3700E6D7C9 /* FoodPro.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EC222D1C5CDD3600E6D7C9 /* FoodPro.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +126,9 @@
 		E43187ED1C5A15E200F40BFE /* You.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = You.png; sourceTree = "<group>"; };
 		E43187EF1C5A1C1F00F40BFE /* Exten_UIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Exten_UIView.swift; sourceTree = "<group>"; };
 		E43188361C5A7A4600F40BFE /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Charts.xcodeproj; sourceTree = "<group>"; };
+		E4C71ECF1C5E2B5500A6FEB6 /* Protein.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Protein.pdf; sourceTree = "<group>"; };
+		E4C71ED11C5E4A0F00A6FEB6 /* VC_c_s.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VC_c_s.swift; sourceTree = "<group>"; };
+		E4EC222D1C5CDD3600E6D7C9 /* FoodPro.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoodPro.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +178,7 @@
 				E43187A41C59F7CC00F40BFE /* ViewController.swift */,
 				E43187C21C59F8F900F40BFE /* Color.swift */,
 				E43187A61C59F7CC00F40BFE /* Main.storyboard */,
+				E4C71ED11C5E4A0F00A6FEB6 /* VC_c_s.swift */,
 				E43187D71C5A098500F40BFE /* VC_c.swift */,
 				E43187D51C5A08CC00F40BFE /* VC_b.swift */,
 				E43187D31C5A071F00F40BFE /* VC_a.swift */,
@@ -201,6 +208,7 @@
 				E43187E91C5A156400F40BFE /* MessageBubble@2x.png */,
 				E43187C51C59F9A700F40BFE /* button1.pdf */,
 				E43187C61C59F9A700F40BFE /* button2.pdf */,
+				E4C71ECF1C5E2B5500A6FEB6 /* Protein.pdf */,
 				E43187C71C59F9A700F40BFE /* button3.pdf */,
 				E43187C81C59F9A700F40BFE /* logo1.pdf */,
 				E43187C91C59F9A700F40BFE /* logos.pdf */,
@@ -216,6 +224,7 @@
 				E43187DA1C5A0CC200F40BFE /* NavigationDelegate.swift */,
 				E43187DC1C5A0D8500F40BFE /* CiecleAnimation.swift */,
 				E43188331C5A7A4600F40BFE /* Charts */,
+				E4EC222D1C5CDD3600E6D7C9 /* FoodPro.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -368,6 +377,7 @@
 				E43187EC1C5A15D500F40BFE /* Me.png in Resources */,
 				E43187AA1C59F7CC00F40BFE /* Assets.xcassets in Resources */,
 				E43187EA1C5A156400F40BFE /* MessageBubble@2x.png in Resources */,
+				E4C71ED01C5E2B5500A6FEB6 /* Protein.pdf in Resources */,
 				E43187CD1C59F9A700F40BFE /* logo1.pdf in Resources */,
 				E43187CB1C59F9A700F40BFE /* button2.pdf in Resources */,
 				E43187CC1C59F9A700F40BFE /* button3.pdf in Resources */,
@@ -400,9 +410,11 @@
 				E43187A31C59F7CC00F40BFE /* AppDelegate.swift in Sources */,
 				E43187D61C5A08CC00F40BFE /* VC_b.swift in Sources */,
 				E43187F01C5A1C1F00F40BFE /* Exten_UIView.swift in Sources */,
+				E4C71ED21C5E4A0F00A6FEB6 /* VC_c_s.swift in Sources */,
 				E43187D21C59FD4200F40BFE /* VC2.swift in Sources */,
 				E43187E21C5A151100F40BFE /* TableHeaderViewCell.swift in Sources */,
 				E43187E81C5A154D00F40BFE /* MessageItem.swift in Sources */,
+				E4EC222E1C5CDD3700E6D7C9 /* FoodPro.swift in Sources */,
 				E43187D01C59FA5100F40BFE /* VC1.swift in Sources */,
 				E43187DB1C5A0CC200F40BFE /* NavigationDelegate.swift in Sources */,
 				E43187C31C59F8F900F40BFE /* Color.swift in Sources */,

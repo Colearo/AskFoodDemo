@@ -12,24 +12,29 @@ import Charts
 class VC_b: UIViewController ,UIScrollViewDelegate{
     @IBOutlet weak var Button: UIButton!
     @IBAction func ClickBtn(sender: UIButton) {
+        BtnNo=2
         self.navigationController?.popToRootViewControllerAnimated(true)
     }
     @IBOutlet weak var scrollView: UIScrollView!
     var barChartView1:BarChartView!
+    var barChartView2:BarChartView!
     let week=["周一","周二","周三","周四","周五","周六","周日"]
     var calo:[Double]!
+    var pro:[Double]!
     @IBOutlet weak var pageControl: UIPageControl!
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
+        BtnNo=0
         setupScrollView()
         //self.updateCharts()
         calo=[1800.4,2700.4,4300.3,3434.2,2321.7,1003.8,2343.9]
+        pro=[20,43,54,65,70,58,61]
         //setChart(months, values: unitsSold)
-        setChart(week, values: calo)
+        setChart1(week, values: calo)
+        setChart2(week, values: pro)
     }
-    func setChart(dataPoints: [String], values: [Double]) {
+    func setChart1(dataPoints: [String], values: [Double]) {
         var dataEntries: [ChartDataEntry] = Array()
         for (i,value) in calo.enumerate()
         {
@@ -64,6 +69,42 @@ class VC_b: UIViewController ,UIScrollViewDelegate{
         barChartView1.animate(xAxisDuration: 1.0, yAxisDuration: 1.0, easingOption: .EaseInOutCubic)
         barChartView1.data = barChartData
     }
+    func setChart2(dataPoints: [String], values: [Double]) {
+        var dataEntries: [ChartDataEntry] = Array()
+        for (i,value) in pro.enumerate()
+        {
+            dataEntries.append(BarChartDataEntry.init(value: value, xIndex: i))
+        }
+        let barChartDataSet = BarChartDataSet(yVals: dataEntries, label: "蛋白质")
+        let barChartData = BarChartData(xVals: dataPoints, dataSet: barChartDataSet)
+        barChartDataSet.colors=[Color.white]
+        barChartDataSet.barSpace = 0.48
+        barChartDataSet.valueTextColor = Color.white
+        barChartView2.descriptionText=""
+        barChartView2.xAxis.labelPosition = .Bottom
+        barChartView2.xAxis.labelTextColor = Color.white
+        
+        barChartView2.legend.textColor=Color.white
+        barChartView2.legend.formSize=20
+        barChartView2.legend.formToTextSpace = 5
+        barChartView2.legend.font=UIFont.systemFontOfSize(15)
+        barChartView2.legend.form = .Circle
+        barChartView2.xAxis.labelFont = UIFont.systemFontOfSize(12)
+        
+        barChartView2.xAxis.spaceBetweenLabels = 2
+        barChartView2.xAxis.drawGridLinesEnabled = false
+        barChartView2.xAxis.drawAxisLineEnabled = false
+        
+        barChartView2.leftAxis.labelTextColor = Color.white
+        barChartView2.leftAxis.drawGridLinesEnabled = false
+        barChartView2.leftAxis.drawAxisLineEnabled = false
+        barChartView2.rightAxis.drawGridLinesEnabled = false
+        barChartView2.rightAxis.drawAxisLineEnabled=false
+        barChartView2.rightAxis.drawLabelsEnabled=false
+        barChartView2.animate(xAxisDuration: 1.0, yAxisDuration: 1.0, easingOption: .EaseInOutCubic)
+        barChartView2.data = barChartData
+    }
+
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         //通过scrollView内容的偏移计算当前显示的是第几页
         let page = Int(scrollView.contentOffset.x / scrollView.frame.size.width)
@@ -86,7 +127,8 @@ class VC_b: UIViewController ,UIScrollViewDelegate{
             CGRectGetHeight(self.scrollView.bounds)
         )
         let size = scrollView.bounds.size
-        barChartView1=BarChartView(frame: CGRectMake(0,0,CGRectGetWidth(self.view.bounds),size.height-50))
+        barChartView1=BarChartView(frame: CGRectMake(2,0,CGRectGetWidth(self.view.bounds)-4,size.height-50))
+        barChartView2=BarChartView(frame: CGRectMake(CGRectGetWidth(self.view.bounds)+8,0,CGRectGetWidth(self.view.bounds)-4,size.height-50))
         //关闭滚动条显示
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
@@ -96,6 +138,7 @@ class VC_b: UIViewController ,UIScrollViewDelegate{
         //滚动时只能停留到某一页
         scrollView.pagingEnabled = true
         scrollView.addSubview(barChartView1)
+        scrollView.addSubview(barChartView2)
     }
     func updateCharts()
     {
