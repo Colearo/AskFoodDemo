@@ -7,13 +7,22 @@
 //
 
 import UIKit
+import Alamofire
+//import Wilddog
+
+//var myRootRef = Wilddog(url:"https://askfood.wilddogio.com")
+
 var VC_A_Frame:CGRect?
+var currentChat:Chat!
+
 class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     var Chats:NSMutableArray!
     var tableView:TableView!
     var me:UserInfo!
     var you:UserInfo!
     var textMsg:UITextField!
+    var currentStr:String!
+    var nextAction:EndType = EndType.NoEnd
     var sendView=UIView(frame: CGRect.zero)
     let btn1:UIButton=UIButton(frame: CGRectMake(100,600,70,30))
     let btn2:UIButton=UIButton(frame: CGRectMake(220,600,70,30))
@@ -21,25 +30,73 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     var count:Int=0
     @IBOutlet weak var Button: UIButton!
     @IBAction func ClickBtn(sender: UIButton) {
-        //BtnNo=1
-        self.navigationController?.popToRootViewControllerAnimated(true)
+        self.navigationController?.popViewControllerAnimated(true)
     }
+    
+    
     @IBAction func testJust(sender: UIButton) {
         //showEditer()
         self.showButton(["你好","hello"])
     }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        //BtnNo=0
-        VC_A_Frame = self.Button.frame
         self.setupChatTable()
         self.setupSendPanel()
         self.setupKeyboard()
         self.setupButton()
         self.setupEditer()
+        //self.setupModel()
         //self.showButton(["你好","hello"])
         //self.showEditer()
     }
+    
+    
+    func setupModel()
+    {
+        if currentChat.isNewDay()
+        {
+            currentStr = ""
+            currentChat = Chat()
+        }
+        
+        
+        var ret = currentChat.getReturned(currentStr, type: QuestionType.Greet)
+        
+        if nextAction == EndType.GreetEnd {
+            ret = currentChat.getReturned(currentStr,type: QuestionType.Food)
+        }
+        else if nextAction == EndType.FoodEnd{
+            ret = currentChat.getReturned(currentStr,type: QuestionType.SmaTalk)
+        }
+        else if nextAction == EndType.AllEnd{
+            self.showEditer()
+            return
+        }
+        nextAction = ret.typeEnd
+        
+        
+        switch ret.returnsty
+            {
+            case .Text :
+                for strItem in ret.strings
+                {
+                    let item = MessageItem(body: strItem, user: you, date: NSDate(), mtype: ChatType.Someone)
+                    Chats.addObject(item)
+                }
+                currentStr = ret.strings[0]
+                self.tableView.reloadData()
+                self.animationLoad()
+            case .Input :
+                self.showEditer()
+            case .Button :
+                self.showButton(ret.strings)
+            }
+        
+    }
+    
+    
     func setupChatTable()
     {
         self.tableView = TableView(frame:CGRectMake(30, 100, self.view.frame.size.width-60, self.view.frame.size.height-170), style:.Plain)
@@ -69,7 +126,8 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         
         Chats = NSMutableArray()
         //Chats.addObjectsFromArray([first, third, fouth, fifth, zero, zero1])
-        let zero =  MessageItem(body:"\(me.username) 晚上好🌃", user:you,  date:NSDate(), mtype:ChatType.Someone)
+        currentStr = ""
+        let zero =  MessageItem(body:currentChat.getReturned(type: QuestionType.Greet).strings[0], user:you,  date:NSDate(), mtype:ChatType.Someone)
         Chats.addObject(zero)
         self.tableView.chatDataSource = self
         self.tableView.reloadData()
@@ -117,15 +175,40 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     {
         //composing=false
         let sender = textMsg
-        let thisChat =  MessageItem(body:sender.text!, user:me, date:NSDate(), mtype:ChatType.Mine)
-        //let thatChat =  MessageItem(body:"你说的是：\(sender.text!)", user:you, date:NSDate(), mtype:ChatType.Someone)
-        Chats.addObject(thisChat)
-        //Chats.addObject(thatChat)
-        self.tableView.chatDataSource = self
-        //self.tableView.reloadData()
-        self.animationLoad()
+        currentStr = sender.text!
         
-        //self.showTableView()
+        let thisChat =  MessageItem(body:sender.text!, user:me, date:NSDate(), mtype:ChatType.Mine)
+        
+        Chats.addObject(thisChat)
+        self.tableView.chatDataSource = self
+        self.tableView.reloadData()
+        if nextAction == .AllEnd
+        {
+            Alamofire.request(.POST, NSURL(string: api_url)!, parameters: ["key":api_key,"info":currentStr,"userid":userId])
+                .responseJSON(options: NSJSONReadingOptions.MutableContainers) { response   in
+                    
+                    let data = response.result
+                    guard data.isSuccess else{
+                        print("Data read error \(data.error)")
+                        return
+                    }
+                    
+                    guard let text = data.value!.objectForKey("text") as? String else{
+                        print("Text is nil!")
+                        return
+                    }
+                    print(text)
+                    let thatChat = MessageItem(body: text, user: self.you, date: NSDate(), mtype: ChatType.Someone)
+                    self.Chats.addObject(thatChat)
+                    self.tableView.reloadData()
+                    self.animationLoad()
+            }
+            sender.resignFirstResponder()
+            sender.text = ""
+            return
+        }
+        self.animationLoad()
+
         sender.resignFirstResponder()
         sender.text = ""
     }
@@ -155,7 +238,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     func keyboardDidShow(notification: NSNotification) {
         let userInfo = notification.userInfo as NSDictionary!
         let frameNew = (userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
-        let insetNewBottom = tableView.convertRect(frameNew, fromView: nil).height
+        let insetNewBottom = tableView.convertRect(frameNew, fromView: nil).height-120
         
         //根据键盘高度设置Inset
         let contentOffsetY = tableView.contentOffset.y
@@ -171,14 +254,21 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     //弹出按钮的初始化设置
     func setupButton()
     {
+        VC_A_Frame = self.Button.frame
+        
+        
         btn1.backgroundColor=Color.green2
         btn1.alpha=0.69
         btn1.tintColor=Color.white
         btn1.setTitleColor(Color.white, forState: .Normal)
+        
+        
         btn2.backgroundColor=Color.green2
         btn2.alpha=0.69
         btn2.tintColor=Color.white
         btn2.setTitleColor(Color.white, forState: .Normal)
+        
+        
         btn1.addTarget(self, action:Selector("sendButton:") ,forControlEvents:.TouchUpInside)
         btn2.addTarget(self, action: Selector("sendButton:"), forControlEvents: .TouchUpInside)
     }
@@ -202,6 +292,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     func sendButton(button:UIButton)
     {
         let temp=button
+        currentStr = button.titleForState(.Normal)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
         let last=MessageItem(body:temp.titleForState(.Normal)!,user:me, date:NSDate(), mtype:ChatType.Mine)
         Chats.addObject(last)
         self.tableView.chatDataSource = self
@@ -240,10 +331,10 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         self.view.addSubview(labela)
         self.view.addSubview(labelb)
         self.view.addSubview(labelc)
-        let one = MessageItem(body: "又过去了美好的一天吧，今天的晚餐吃了吗", user: you, date: NSDate(), mtype: .Someone)
-        let two = MessageItem(body: "哦哦，知道了", user: you, date: NSDate(), mtype: .Someone)
-        let imaget = MessageItem(image: UIImage(named: "Protein")!, user: you, date: NSDate(), mtype: .Someone)
-        let three = MessageItem(body: "牛肉——蛋白质；看起来很丰盛哦，晚餐的卡路里和蛋白质都符合要求，也请多吃一些蔬菜哦", user: you, date: NSDate(), mtype: .Someone)
+        //let one = MessageItem(body: "又过去了美好的一天吧，今天的晚餐吃了吗", user: you, date: NSDate(), mtype: .Someone)
+        //let two = MessageItem(body: "哦哦，知道了", user: you, date: NSDate(), mtype: .Someone)
+        //let imaget = MessageItem(image: UIImage(named: "Protein")!, user: you, date: NSDate(), mtype: .Someone)
+        //let three = MessageItem(body: "牛肉——蛋白质；看起来很丰盛哦，晚餐的卡路里和蛋白质都符合要求，也请多吃一些蔬菜哦", user: you, date: NSDate(), mtype: .Someone)
         UIView.animateWithDuration(0.1, delay: 0.0, options: .CurveLinear, animations: {
             labela.alpha=1.0
             }, completion: nil)
@@ -262,7 +353,8 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         UIView.animateWithDuration(0.5, delay: 0.7, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.1, options: [.AllowUserInteraction,.CurveEaseInOut], animations: {
             labelc.center.y-=8
             }, completion: { finished in
-                switch self.count{
+                self.setupModel()
+                /*switch self.count{
                 case 1:
                     self.Chats.addObject(one)
                     self.tableView.reloadData()
@@ -277,7 +369,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
                     self.showButton(["OK","为什么呢"])
                 default:
                     self.showButton(["你好","晚上好"])
-                }
+                }*/
                 //self.tableView.reloadData()
                 labela.removeFromSuperview()
                 labelb.removeFromSuperview()
@@ -294,7 +386,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         btn3.alpha=0.69
         btn3.tintColor=Color.white
         btn3.setTitleColor(Color.white, forState: .Normal)
-        btn3.setTitle("  现在录入膳食信息  ", forState: .Normal)
+        btn3.setTitle("  现在输入信息  ", forState: .Normal)
         btn3.addTarget(self, action:Selector("clickEditer:") ,forControlEvents:.TouchUpInside)
     }
     func showEditer()

@@ -12,8 +12,8 @@ import Charts
 class VC_b: UIViewController ,UIScrollViewDelegate{
     @IBOutlet weak var Button: UIButton!
     @IBAction func ClickBtn(sender: UIButton) {
-        BtnNo=2
-        self.navigationController?.popToRootViewControllerAnimated(true)
+        //BtnNo=2
+        self.navigationController?.popViewControllerAnimated(true)
     }
     @IBOutlet weak var scrollView: UIScrollView!
     var barChartView1:BarChartView!
@@ -25,7 +25,7 @@ class VC_b: UIViewController ,UIScrollViewDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        BtnNo=0
+        //BtnNo=0
         setupScrollView()
         //self.updateCharts()
         calo=[1800.4,2700.4,4300.3,3434.2,2321.7,1003.8,2343.9]

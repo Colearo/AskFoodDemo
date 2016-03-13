@@ -12,6 +12,8 @@ class VC2: UIViewController {
     @IBOutlet weak var Button1: UIButton!
     @IBOutlet weak var Button2: UIButton!
     @IBOutlet weak var Button3: UIButton!
+    
+    
     @IBAction func ClickBtn1(sender: UIButton) {
         BtnNo=1
     }
@@ -22,13 +24,18 @@ class VC2: UIViewController {
         BtnNo=3
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        BtnNo=0
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
 }
+
+
+
 extension CALayer {
     func setColorFromUIColor(color:UIColor)
     {

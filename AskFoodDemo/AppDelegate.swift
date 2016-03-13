@@ -7,6 +7,9 @@
 //
 
 import UIKit
+let api_key = "4ef0963d04ca39f4292c1752994f09ca"
+let api_url = "http://www.tuling123.com/openapi/api"
+let userId = "colearo123"
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +19,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // 得到当前应用的版本号
+        let infoDictionary = NSBundle.mainBundle().infoDictionary
+        let currentAppVersion = infoDictionary!["CFBundleShortVersionString"] as! String
+        
+        // 取出之前保存的版本号
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        let appVersion = userDefaults.stringForKey("appVersion")
+        let DayData = userDefaults.integerForKey("Day")
+        let currentTime = userDefaults.valueForKey("currentTime")
+        let date=NSDateFormatter()
+        date.dateFormat = "dd"
+        let stDay = Int(date.stringFromDate(NSDate()))
+        currentChat = Chat()
+        
+        
+        // 如果 appVersion 为 nil 说明是第一次启动；如果 appVersion 不等于 currentAppVersion 说明是更新了
+        if appVersion == nil || appVersion != currentAppVersion || DayData == 0 || currentTime == nil{
+            // 保存最新的版本号
+            userDefaults.setValue(currentAppVersion, forKey: "appVersion")
+            userDefaults.setValue(stDay!, forKey: "Day")
+            userDefaults.setValue(currentChat.judgeTime().hashValue, forKey: "currentTime")
+        }
+        
         return true
     }
 

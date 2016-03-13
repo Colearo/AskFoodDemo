@@ -4,6 +4,7 @@
 //
 //  Created by Colearo on 16/1/28.
 //  Copyright © 2016年 Colearo. All rights reserved.
+//  
 //
 
 import UIKit
@@ -11,12 +12,12 @@ import UIKit
 class VC_c: UIViewController {
     @IBOutlet weak var Button: UIButton!
     @IBAction func ClickBtn(sender: UIButton) {
-        BtnNo=3
-        self.navigationController?.popToRootViewControllerAnimated(true)
+        //BtnNo=3
+        self.navigationController?.popViewControllerAnimated(true)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        BtnNo=0
+        BtnNo = 3
         let logos=UIImageView(image:UIImage(named:"logos"))
         let Inf_btn=UIButton(frame: CGRectMake(30,300,320,50))
         let About_btn=UIButton(frame: CGRectMake(30,355,320,50))
@@ -41,6 +42,7 @@ class VC_c: UIViewController {
     func toAbout()
     {
         let vc = VC_c_s()
-        self.navigationController?.pushViewController(vc, animated: true)
+        BtnNo = 4
+        self.navigationController?.pushViewController(vc, animated: false)
     }
 }
