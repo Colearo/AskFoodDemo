@@ -51,7 +51,8 @@ class ViewController: UIViewController {
         UIView.animateWithDuration(1.5, delay: 1.6, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.0, options: [.AllowUserInteraction,.CurveEaseInOut], animations: {
             labelf.transform=scale
             }, completion: {finished in
-                self.performSegueWithIdentifier("s1", sender: nil)
+                //self.performSegueWithIdentifier("s1", sender: nil)
+                self.performSegueWithIdentifier("LoginorSign", sender: nil)
         })
     }
 

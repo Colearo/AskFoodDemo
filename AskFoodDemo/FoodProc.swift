@@ -6,17 +6,21 @@
 //  Copyright © 2016年 Colearo. All rights reserved.
 //
 
+import AVFoundation
 import Foundation
+import Wilddog
+import UIKit
 
 
 //枚举集合，表示性别
-public enum Sex{
-    case Female
-    case Male
+public enum Sex: String{
+    case Female = "F"
+    case Male = "M"
 }
 //枚举集合，表示劳动强度
-public enum LabourIntensity{
-    case Small,Middle,High
+public enum LabourIntensity: Int{
+    case Small = 0,Middle = 1,High = 2
+    
 }
 //枚举集合，表示时间段
 public enum TimeDur{
@@ -25,6 +29,17 @@ public enum TimeDur{
 //枚举集合，表示按钮返回类型
 public enum ReturnStyle{
     case Input,Button,Text
+    func strFrom(str:String)->ReturnStyle
+    {
+        switch str
+        {
+            case "Input":return .Input
+            case "Button":return .Button
+            case "Text":return .Text
+            default:
+            return .Text
+        }
+    }
 }
 //枚举集合，表示膳食评级
 public enum RankStage: Int{
@@ -38,11 +53,15 @@ public enum QuestionType{
 public enum MyError : ErrorType{
     case BeZero
 }
+
 public enum Step{
     case GreetAsk,GreetBack,FoodAsk,FoodBackNo,FoodBackYes
 }
 public enum EndType{
     case GreetEnd,FoodEnd,NoEnd,AllEnd
+}
+public enum NutriType{
+    case EER,PRO,Fat
 }
 
 //营养计算
@@ -64,16 +83,57 @@ class Nutrition {
     private let CHO:[Int: Double] = [1: 120,11: 150,18: 120]
     private let Ca:[Int: Double] = [7: 1000,11: 1200,14: 1000,18: 800,50: 1000]
     private let Vc:Double=100
-    private let _Age = 20
-    private let _Sex:Sex = .Male
-    private let _Intensity:LabourIntensity = .Middle
+    private var _Age = 20
+    private var _Sex:Sex = .Male
+    private var _Intensity:LabourIntensity = .Middle
     //func computNutri(Age: Int,Sexof: Sex,Intensity: LabourIntensity,Time: TimeDur)->(Vc:Double,Ca:Double,CHO: Double,Fat: Double,EER: Double,PRO: Double)
-    
+    init()
+    {
+        let myProfileRef = myRootRef.childByAppendingPath("Profile")
+        myProfileRef.observeSingleEventOfType(.Value, withBlock: {
+            snap in
+            if let age = snap.value.objectForKey(VC_c_t.Static.age) as? Int
+            {
+                self._Age = age
+                print(age)
+            }
+            
+            switch (snap.value.objectForKey(VC_c_t.Static.gender) as? String)!
+            {
+                case "F":
+                self._Sex = .Female
+                case "M":
+                self._Sex = .Male
+                default:
+                self._Sex = .Male
+            }
+            
+            switch (snap.value.objectForKey(VC_c_t.Static.labourIntensity) as? Int)!
+            {
+            case 0:
+                self._Intensity = .Small
+            case 1:
+                self._Intensity = .Middle
+            case 2:
+                self._Intensity = .High
+            default:
+                self._Intensity = .Middle
+            }
+        },
+            withCancelBlock: { error in
+            print(error.description)
+        })
+    }
     
     /*****************计算营养推荐量的函数，通过查表获得数据*****************************/
-    func computNutri(Age: Int = 20,Sexof: Sex = .Male,Intensity: LabourIntensity = .Middle,Time: TimeDur)->(Vc:Double,Ca:Double,CHO: Double,Fat: Double,EER: Double,PRO: Double)
+    func computNutri(Time: TimeDur) -> (Vc:Double,Ca:Double,CHO: Double,Fat: Double,EER: Double,PRO: Double)
     {
+        
+        let Age: Int = _Age,Sexof: Sex = _Sex,Intensity: LabourIntensity = _Intensity
+        
         var _EER=0.0,_PRO=0.0,_CHO=0.0,_Ca=0.0,_Vc=0.0,_Fat=0.0
+        
+        
         if Age>8 && Age<=11{
             _EER=self.EER[Sexof]![Intensity]![Age]!
             _Ca=((Age==11) ? self.Ca[Age] : self.Ca[7])!
@@ -131,6 +191,9 @@ class Nutrition {
     func computCurrent(foodList:[(Food: foodData,Amount: Double)])->(Vc:Double,Ca:Double,CHO: Double,Fat: Double,EER: Double,PRO: Double)
     {
         var _EER=0.0,_PRO=0.0,_CHO=0.0,_Ca=0.0,_Vc=0.0,_Fat=0.0
+        var EER=0.0,PRO=0.0,Vc=0.0,CHO=0.0,Ca=0.0,Fat=0.0
+        
+        
         for current in foodList
         {
             var _amount = 0.0
@@ -148,6 +211,19 @@ class Nutrition {
             _Vc += _amount * current.Food.Vc
             _Fat += _amount * current.Food.Fat
         }
+        let currentRef = myRootRef.childByAppendingPath(currentChat.dateForm("yyMMdd"))
+        currentRef.observeSingleEventOfType(.Value, withBlock: {
+            snap in
+            print(snap.value.objectForKey("EER"))
+            
+            EER = (snap.value.objectForKey("EER") as? Double)!
+            PRO = (snap.value.objectForKey("PRO") as? Double)!
+            Vc = (snap.value.objectForKey("Vc") as? Double)!
+            Fat = (snap.value.objectForKey("Fat") as? Double)!
+            CHO = (snap.value.objectForKey("CHO") as? Double)!
+            Ca = (snap.value.objectForKey("Ca") as? Double)!
+        })
+        currentRef.updateChildValues(["EER": _EER+EER,"PRO": _PRO+PRO,"Vc": _Vc+Vc,"Fat" : _Fat+Fat,"CHO": _CHO+CHO,"Ca": _Ca+Ca])
         return (_Vc,_Ca,_CHO,_Fat,_EER,_PRO)
     }
     
@@ -156,7 +232,7 @@ class Nutrition {
     func rankCurrent(foodList:[(Food: foodData,Amount: Double)])->(Min: (rank: RankStage,name: String,ratio: Double),Max:(rank: RankStage,name: String,ratio: Double),Average: RankStage)
     {
         
-        let _RNI = computNutri(Time: Chat().judgeTime())
+        let _RNI = computNutri(Chat().judgeTime())
         let _current = computCurrent(foodList)
         
         let _ratioEER = _current.EER / _RNI.EER
@@ -269,88 +345,125 @@ class Chat {
         }
         return .Morning
     }
+    func dateForm(Formate:String!) -> String
+    {
+        let date=NSDateFormatter()
+        date.dateFormat = Formate
+        return date.stringFromDate(NSDate())
+    }
     func isNewDay(newDay:NSDate = NSDate())->Bool
     {
         let oldDay = NSUserDefaults.standardUserDefaults().integerForKey("Day")
+        let openDay = NSUserDefaults.standardUserDefaults().integerForKey("openDay")
         let date=NSDateFormatter()
-        date.dateFormat = "dd"
+        date.dateFormat = "yyMMdd"
         let dayNew = Int(date.stringFromDate(newDay))
         let dayOld = oldDay
-        if dayNew>dayOld
+        if dayNew >= dayOld || dayNew == openDay
         {
             NSUserDefaults.standardUserDefaults().setValue(dayNew!, forKey: "Day")
             return true
         }
         return false
     }
-    /*获取返回语句*/
-    func getReturned(str:String = "",type:QuestionType)->(strings:[String],returnsty:ReturnStyle,typeEnd:EndType)
+    func getVoice(str:String,rates:Float)
     {
+        let synthesizer = AVSpeechSynthesizer();
+        var utterance = AVSpeechUtterance(string: "");
+        utterance = AVSpeechUtterance(string: str);
+        utterance.voice = AVSpeechSynthesisVoice(language:"zh-CN");
+        utterance.pitchMultiplier = 0.5
+        utterance.rate = rates;
+        synthesizer.speakUtterance(utterance);
+    }
+    
+    func putTag()
+    {
+        
+    }
+    /*获取返回语句*/
+    func getReturned(str:String = "",type:QuestionType)->(strings:[String],returnsty:ReturnStyle,typeEnd:EndType, image:MessageItem? )
+    {
+        let currentRef = myRootRef.childByAppendingPath(dateForm("yyMMdd")).childByAppendingPath(String(self.judgeTime()))
         self.chatStr=str
         let currentDur = self.judgeTime()
         var returnedStr = [""]
+        
+        
         switch type
         {
         case .Food:
-            return (["嗯","OK"],.Button,EndType.FoodEnd)
+            currentRef.updateChildValues(["isAsked": true])
+            return (["嗯","OK"],.Button,EndType.FoodEnd , nil)
+            
         case .Greet:
+            currentRef.observeSingleEventOfType(WEventType.Value, withBlock: {snapshot in
+                guard  snapshot.value.objectForKey("isAsked") as? Bool != nil else
+                {
+                    print("Error no data")
+                    return
+                }
+                self.doNotAsk[self.judgeTime()] = snapshot.value.objectForKey("isAsked") as? Bool
+            })
             if self.doNotAsk[self.judgeTime()] == true
             {
-                return self.getReturned( type: .SmaTalk)
+                return self.getReturned(type: .SmaTalk)
             }
             else if self.isGreeted[currentDur]![.GreetAsk] == false
             {
                 returnedStr = getReturned_greet(.GreetAsk)
                 self.isGreeted[currentDur]![.GreetAsk]=true
-                return (returnedStr,.Text,EndType.NoEnd)
+                return (returnedStr,.Text,EndType.NoEnd, nil)
             }
             else if self.isGreeted[currentDur]![.GreetBack] == false
             {
                 returnedStr = getReturned_greet(.GreetBack)
                 self.isGreeted[currentDur]![.GreetBack]=true
-                return (returnedStr,.Button,EndType.NoEnd)
+                return (returnedStr,.Button,EndType.NoEnd , nil)
             }
             else if self.isGreeted[currentDur]![.FoodAsk] == false
             {
                 returnedStr = getReturned_greet(.FoodAsk)
                 self.isGreeted[currentDur]![.FoodAsk]=true
-                return (returnedStr,.Text,EndType.NoEnd)
+                return (returnedStr,.Text,EndType.NoEnd , nil)
             }
             else if self.isGreeted[currentDur]![.FoodBackYes] == false
             {
+                if self.isGreeted[currentDur]![.FoodBackNo] == true
+                {
+                    return (["愿你享受一个美妙的一天"],.Text,EndType.AllEnd, nil)
+                }
                 switch str
                 {
                 case "还没有":
                     returnedStr = getReturned_greet(.FoodBackNo)
                     self.isGreeted[currentDur]![.FoodBackNo]=true
-                    return (returnedStr,.Text,EndType.NoEnd)
+                    return (returnedStr,.Text,EndType.NoEnd, nil)
                 case "吃啦":
                     returnedStr = getReturned_greet(.FoodBackYes)
                     self.isGreeted[currentDur]![.FoodBackYes]=true
-                    return (returnedStr,.Text,EndType.NoEnd)
+                    return (returnedStr,.Text,EndType.NoEnd, nil)
                 default:
-                    return (["吃啦","还没有"],.Button,EndType.NoEnd)
+                    return (["吃啦","还没有"],.Button,EndType.NoEnd, nil)
                 }
             }
             else if self.isGreeted[currentDur]![.FoodBackYes] == true && self.isAsked[self.judgeTime()] == false
             {
                 self.isAsked[self.judgeTime()] = true
-                return ([""],.Input,EndType.NoEnd)
+                return ([""],.Input,EndType.NoEnd, nil)
             }
             else if self.isGreeted[currentDur]![.FoodBackYes] == true
             {
                 self.doNotAsk[self.judgeTime()] = true
-                returnedStr = self.getReturned_food(Nutrition())
-                return (returnedStr,.Text,EndType.GreetEnd)
-            }
-            else if self.isGreeted[currentDur]![.FoodBackNo] == true
-            {
-                return (["愿你享受一个美妙的一天"],.Text,EndType.AllEnd)
+                let returned = self.getReturned_food(Nutrition())
+                returnedStr = returned.chat
+                let image = returned.imageItem
+                return (returnedStr,.Text,EndType.GreetEnd, image)
             }
         case .SmaTalk:
-            return (returnedStr,.Input,EndType.AllEnd)
+            return (returnedStr,.Input,EndType.AllEnd, nil)
         }
-        return ([""],.Input,EndType.NoEnd)
+        return (["愿你享受一个美妙的一天"],.Input,EndType.NoEnd, nil)
     }
     func getReturned_greet(step: Step)->[String]
     {
@@ -402,18 +515,18 @@ class Chat {
             switch self.judgeTime()
             {
             case .Morning:
-                return [_step1_morn_sts[try!self.randomIndex(_step3_morn_sts.count)]]
+                return [_step3_morn_sts[try!self.randomIndex(_step3_morn_sts.count)]]
             case .Noon:
-                return [_step1_noon_sts[try!self.randomIndex(_step3_noon_sts.count)]]
+                return [_step3_noon_sts[try!self.randomIndex(_step3_noon_sts.count)]]
             case .Night:
-                return [_step1_night_sts[try!self.randomIndex(_step3_night_sts.count)]]
+                return [_step3_night_sts[try!self.randomIndex(_step3_night_sts.count)]]
             }
         case .FoodBackYes:
             return [_step4_sts[try!self.randomIndex(_step4_sts.count)]]
         }
     }
     /*获取食物相关返回语句数组*/
-    func getReturned_food(_nutrition:Nutrition)->[String]
+    func getReturned_food(_nutrition:Nutrition)->(chat: [String],imageItem: MessageItem? )
     {
         var chats = [""]
         let _start_sts = ["听起来还不错哟","哦，好像很美味呢","Yo～很丰盛的一餐呢","看来不错哟"]
@@ -431,6 +544,10 @@ class Chat {
         let _ca_food = ["高钙食物","牛奶","大豆","海带","虾皮","酸角"]
         
         let foolist = self.processStr_Food(self.chatStr!)
+        if foolist.count==0
+        {
+            return (["额，喂喂，你好像没有提到任何食物吧=_="] , nil)
+        }
         let current_rank = _nutrition.rankCurrent(foolist)
         chats[0] = _start_sts[try! self.randomIndex(_start_sts.count)]
         
@@ -447,7 +564,30 @@ class Chat {
             chats.append(_great_sts[try! self.randomIndex(_great_sts.count)])
         }
         
+        
         chats.append("\(_max_pre_sts[try! self.randomIndex(_max_pre_sts.count)])\(current_rank.Max.name)\(_max_sub_sts[try! self.randomIndex(_max_sub_sts.count)])")
+        
+        var image: MessageItem?
+        
+        switch current_rank.Max.name
+        {
+        case "能量（卡路里）":
+            image = MessageItem(image: UIImage(named:"EER")!, user: UserInfo(name:"AF君", logo:("You")), date: NSDate(), mtype: .Someone)
+        case "蛋白质":
+            image = MessageItem(image: UIImage(named:"PRO")!, user: UserInfo(name:"AF君", logo:("You")), date: NSDate(), mtype: .Someone)
+        case "碳水化合物":
+            image = MessageItem(image: UIImage(named:"CHO")!, user: UserInfo(name:"AF君", logo:("You")), date: NSDate(), mtype: .Someone)
+        case "脂肪":
+            image = MessageItem(image: UIImage(named:"Fat")!, user: UserInfo(name:"AF君", logo:("You")), date: NSDate(), mtype: .Someone)
+        case "钙":
+            image = MessageItem(image: UIImage(named:"Ca")!, user: UserInfo(name:"AF君", logo:("You")), date: NSDate(), mtype: .Someone)
+        case "维生素C":
+            image = MessageItem(image: UIImage(named:"Vc")!, user: UserInfo(name:"AF君", logo:("You")), date: NSDate(), mtype: .Someone)
+        default :
+            image = nil
+        }
+        
+        
         var sub = ""
         switch current_rank.Min.name
         {
@@ -474,7 +614,7 @@ class Chat {
         }
         chats.append("根据分析，\(current_rank.Min.name)类较缺乏，推荐\(sub)天然食物")
         
-        return chats
+        return (chats,image)
         
     }
     /*处理分词词组*/
@@ -487,6 +627,11 @@ class Chat {
             let retR = foodWord.filter({$0.name.hasPrefix(_value) || _value.hasPrefix($0.name)})
             if retR.count != 0
             {
+                guard _index>=2 else
+                {
+                    _result.append((Food: (retR.first)!,Amount: 0))
+                    break
+                }
                 let _chosed = [_token[_index-1],_token[_index-2]]
                 var _appended = false
                 for x in _chosed
@@ -541,7 +686,38 @@ class Chat {
         }
         return _result
     }
-    
+    func getCurrentData(type:NutriType) -> [Double]
+    {
+        var data : [Double] = [Double]()
+        myRootRef.queryOrderedByKey().queryStartingAtValue("1").queryLimitedToLast(7).observeEventType(.ChildAdded, withBlock: {
+            snap in
+            switch type{
+            case .EER:
+                if let eer = snap.value.objectForKey("EER"){
+                    data.append(eer as! Double)
+                    print(eer)
+                }
+            case .Fat:
+                if let fat = snap.value.objectForKey("Fat"){
+                    data.append(Double(fat as! NSNumber))
+                    print(fat)
+                }
+            case .PRO:
+                if let pro = snap.value.objectForKey("PRO"){
+                    data.append(Double(pro as! NSNumber))
+                    print(pro)
+                }
+            }
+        })
+        if data.count < 7
+        {
+            for _ in data.count...6
+            {
+                data.append(0.0)
+            }
+        }
+        return data
+    }
 }
 
 

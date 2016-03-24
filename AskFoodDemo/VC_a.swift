@@ -8,9 +8,12 @@
 
 import UIKit
 import Alamofire
-//import Wilddog
+import Foundation
+import Wilddog
+import SCLAlertView
 
-//var myRootRef = Wilddog(url:"https://askfood.wilddogio.com")
+var myRootRef = Wilddog(url:"https://askfood.wilddogio.com")
+let dataRef = Wilddog(url: "https://askfood.wilddogio.com/Data")
 
 var VC_A_Frame:CGRect?
 var currentChat:Chat!
@@ -47,7 +50,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         self.setupKeyboard()
         self.setupButton()
         self.setupEditer()
-        //self.setupModel()
+        self.checkOnline()
         //self.showButton(["你好","hello"])
         //self.showEditer()
     }
@@ -55,11 +58,22 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
     
     func setupModel()
     {
-        if currentChat.isNewDay()
-        {
-            currentStr = ""
-            currentChat = Chat()
-        }
+        print(currentChat.dateForm("yyMMdd"))
+            //let chatRef = myRootRef.childByAppendingPath("Chat")
+            //chatRef.setValue([String(NSUserDefaults.standardUserDefaults().integerForKey("Day")): [String(TimeDur.Night): false]])
+        let currentRef = myRootRef.childByAppendingPath(currentChat.dateForm("yyMMdd"))
+        currentRef.observeSingleEventOfType(.Value, withBlock: {
+            snap in
+            if snap.hasChildren() != true
+            {
+                currentRef.setValue([String(TimeDur.Morning): ["isAsked" : false,"contextTag": ""],String(TimeDur.Noon): ["isAsked" : false,"contextTag": ""],String(TimeDur.Night): ["isAsked" : false,"contextTag": ""],"EER": 0,"PRO": 0,"Vc": 0])
+            }
+        })
+        
+        //currentRef.observeEventType(.ChildChanged, withBlock: {
+        //    snap in
+        //    print(snap.value.objectForKey("contextTag"))
+        //})
         
         
         var ret = currentChat.getReturned(currentStr, type: QuestionType.Greet)
@@ -67,25 +81,27 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         if nextAction == EndType.GreetEnd {
             ret = currentChat.getReturned(currentStr,type: QuestionType.Food)
         }
-        else if nextAction == EndType.FoodEnd{
+        if nextAction == EndType.FoodEnd{
             ret = currentChat.getReturned(currentStr,type: QuestionType.SmaTalk)
         }
-        else if nextAction == EndType.AllEnd{
+        if nextAction == EndType.AllEnd{
+            currentChat.getVoice(currentStr,rates: 0.4)
             self.showEditer()
             return
         }
         nextAction = ret.typeEnd
-        
-        
         switch ret.returnsty
             {
             case .Text :
+                if ret.image != nil
+                {
+                    Chats.addObject(ret.image!)
+                }
                 for strItem in ret.strings
                 {
                     let item = MessageItem(body: strItem, user: you, date: NSDate(), mtype: ChatType.Someone)
                     Chats.addObject(item)
                 }
-                currentStr = ret.strings[0]
                 self.tableView.reloadData()
                 self.animationLoad()
             case .Input :
@@ -94,6 +110,21 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
                 self.showButton(ret.strings)
             }
         
+    }
+    
+   
+    func checkOnline()
+    {
+        let connectedRef = Wilddog(url:"https://askfood.wilddogio.com/.info/connected")
+        connectedRef.observeEventType(.Value, withBlock: { snapshot in
+            let connected = snapshot.value as? Bool
+            if connected != nil && connected! {
+                print("connected")
+            } else {
+                SCLAlertView().showNotice("注意", subTitle: "连接已经断开", closeButtonTitle: "确定")
+                print("not connected")
+            }
+        })
     }
     
     
@@ -114,21 +145,13 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         
         //let second =  MessageItem(image:UIImage(named:"button1")!,user:me, date:NSDate(timeIntervalSinceNow:-290), mtype:ChatType.Mine)
         
-        //let third =  MessageItem(body:"太赞了，我也想去那看看呢！",user:you, date:NSDate(timeIntervalSinceNow:-60), mtype:ChatType.Someone)
-        
-        //let fouth =  MessageItem(body:"嗯，下次我们一起去吧！",user:me, date:NSDate(timeIntervalSinceNow:-20), mtype:ChatType.Mine)
-        
-        //let fifth =  MessageItem(body:"好的，一定！",user:you, date:NSDate(timeIntervalSinceNow:0), mtype:ChatType.Someone)
-        
-        //let zero =  MessageItem(body:"最近去哪玩了？", user:you,  date:NSDate(timeIntervalSinceNow:-96400), mtype:ChatType.Someone)
-        
-        //let zero1 =  MessageItem(body:"去了趟云南，明天发照片给你哈？", user:me,  date:NSDate(timeIntervalSinceNow:-86400), mtype:ChatType.Mine)
-        
         Chats = NSMutableArray()
-        //Chats.addObjectsFromArray([first, third, fouth, fifth, zero, zero1])
+        
+        currentChat = Chat()
         currentStr = ""
         let zero =  MessageItem(body:currentChat.getReturned(type: QuestionType.Greet).strings[0], user:you,  date:NSDate(), mtype:ChatType.Someone)
         Chats.addObject(zero)
+        
         self.tableView.chatDataSource = self
         self.tableView.reloadData()
         self.view.addSubview(self.tableView)
@@ -331,10 +354,8 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         self.view.addSubview(labela)
         self.view.addSubview(labelb)
         self.view.addSubview(labelc)
-        //let one = MessageItem(body: "又过去了美好的一天吧，今天的晚餐吃了吗", user: you, date: NSDate(), mtype: .Someone)
-        //let two = MessageItem(body: "哦哦，知道了", user: you, date: NSDate(), mtype: .Someone)
-        //let imaget = MessageItem(image: UIImage(named: "Protein")!, user: you, date: NSDate(), mtype: .Someone)
-        //let three = MessageItem(body: "牛肉——蛋白质；看起来很丰盛哦，晚餐的卡路里和蛋白质都符合要求，也请多吃一些蔬菜哦", user: you, date: NSDate(), mtype: .Someone)
+        currentChat.getVoice(currentStr,rates: 0.4)
+        
         UIView.animateWithDuration(0.1, delay: 0.0, options: .CurveLinear, animations: {
             labela.alpha=1.0
             }, completion: nil)

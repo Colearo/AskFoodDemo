@@ -7,6 +7,7 @@
 //
 
 import UIKit
+
 var BtnNo=0
 class VC2: UIViewController {
     @IBOutlet weak var Button1: UIButton!

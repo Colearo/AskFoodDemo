@@ -80,6 +80,7 @@ class VC1: UIViewController {
                         UIView.animateWithDuration(1.0, delay: 0.0, options: .CurveEaseInOut, animations: {
                             label.alpha=1.0
                             }, completion: { finished in
+                                currentChat.getVoice("欢迎回来",rates: 0.5)
                                 self.performSegueWithIdentifier("s2", sender: nil)
                         })
                         

@@ -13,11 +13,13 @@ class VC_c: UIViewController {
     @IBOutlet weak var Button: UIButton!
     @IBAction func ClickBtn(sender: UIButton) {
         //BtnNo=3
-        self.navigationController?.popViewControllerAnimated(true)
+        self.navigationController?.popToRootViewControllerAnimated(true)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         BtnNo = 3
+        
+        
         let logos=UIImageView(image:UIImage(named:"logos"))
         let Inf_btn=UIButton(frame: CGRectMake(30,300,320,50))
         let About_btn=UIButton(frame: CGRectMake(30,355,320,50))
@@ -27,6 +29,7 @@ class VC_c: UIViewController {
         Inf_btn.layer.borderWidth=1.5
         Inf_btn.setTitle("个人信息", forState: .Normal)
         Inf_btn.setTitleColor(Color.white, forState: .Normal)
+        Inf_btn.addTarget(self, action: Selector("toTable"), forControlEvents: .TouchUpInside)
         Inf_btn.setTitleColor(Color.orange, forState: .Highlighted)
         About_btn.layer.cornerRadius=10
         About_btn.layer.borderColor=Color.white.CGColor
@@ -38,11 +41,21 @@ class VC_c: UIViewController {
         self.view.addSubview(logos)
         self.view.addSubview(Inf_btn)
         self.view.addSubview(About_btn)
+        
+        
     }
+    
     func toAbout()
     {
         let vc = VC_c_s()
         BtnNo = 4
-        self.navigationController?.pushViewController(vc, animated: false)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func toTable()
+    {
+        BtnNo = 5
+        self.navigationController?.performSegueWithIdentifier("toTable", sender: nil)
+        //self.navigationController?.pushViewController(VC_c_t(coder: NSCoder()), animated: true)
     }
 }

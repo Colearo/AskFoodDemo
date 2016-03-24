@@ -52,3 +52,10 @@ extension UIView {
 let kScreen_height: CGFloat = UIScreen.mainScreen().bounds.size.height
 let kScreen_width: CGFloat = UIScreen.mainScreen().bounds.size.width
 let kScreen_frame: CGRect = CGRectMake(0, 0, kScreen_width, kScreen_height)
+extension String{
+    func getLength()->Int{
+        return (self as NSString).length
+        
+    }
+    
+}

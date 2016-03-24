@@ -131,17 +131,18 @@ class TableView:UITableView,UITableViewDelegate, UITableViewDataSource
     
     func tableView(tableView:UITableView,heightForRowAtIndexPath  indexPath:NSIndexPath) -> CGFloat
     {
+        var height:CGFloat = 0.0
         // Header
         if (indexPath.row == 0)
         {
             return TableHeaderViewCell.getHeight()
         }
-        let section : AnyObject  =  self.bubbleSection[indexPath.section]
-        let data = section[indexPath.row - 1]
-        
-        let item =  data as! MessageItem
-        let height  = item.insets.top + max(item.view.frame.size.height , 52) + item.insets.bottom
-        print("height:\(height)")
+        if let section  =  self.bubbleSection[indexPath.section] as? NSMutableArray{
+            let data = section[indexPath.row - 1]
+            let item =  data as! MessageItem
+             height  = item.insets.top + max(item.view.frame.size.height , 52) + item.insets.bottom
+            print("height:\(height)")
+        }
         return height
     }
     
@@ -153,19 +154,21 @@ class TableView:UITableView,UITableViewDelegate, UITableViewDataSource
             let cellId = "HeaderCell"
             
             let hcell =  TableHeaderViewCell(reuseIdentifier:cellId)
-            let section : AnyObject  =  self.bubbleSection[indexPath.section]
-            let data = section[indexPath.row] as! MessageItem
-            hcell.setDate(data.date)
-            return hcell
+            if let section  =  self.bubbleSection[indexPath.section] as? NSMutableArray{
+                let data = section[indexPath.row] as! MessageItem
+                hcell.setDate(data.date)
+                return hcell
+            }
         }
         // Standard
         let cellId = "ChatCell"
+        var data:MessageItem!
         
-        let section : AnyObject  =  self.bubbleSection[indexPath.section]
-        let data = section[indexPath.row - 1]
-        
-        let cell =  TableViewCell(data:data! as! MessageItem, reuseIdentifier:cellId)
-        
-        return cell
+        if let section  =  self.bubbleSection[indexPath.section] as? NSMutableArray{
+            data = section[indexPath.row - 1] as! MessageItem
+            let cell =  TableViewCell(data:data as MessageItem, reuseIdentifier:cellId)
+            return cell
+        }
+        return TableViewCell(data: data, reuseIdentifier: cellId)
     }
 }
