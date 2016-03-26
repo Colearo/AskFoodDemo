@@ -61,14 +61,7 @@ class VC_a: UIViewController,ChatDataSource,UITextFieldDelegate{
         print(currentChat.dateForm("yyMMdd"))
             //let chatRef = myRootRef.childByAppendingPath("Chat")
             //chatRef.setValue([String(NSUserDefaults.standardUserDefaults().integerForKey("Day")): [String(TimeDur.Night): false]])
-        let currentRef = myRootRef.childByAppendingPath(currentChat.dateForm("yyMMdd"))
-        currentRef.observeSingleEventOfType(.Value, withBlock: {
-            snap in
-            if snap.hasChildren() != true
-            {
-                currentRef.setValue([String(TimeDur.Morning): ["isAsked" : false,"contextTag": ""],String(TimeDur.Noon): ["isAsked" : false,"contextTag": ""],String(TimeDur.Night): ["isAsked" : false,"contextTag": ""],"EER": 0,"PRO": 0,"Vc": 0])
-            }
-        })
+        
         
         //currentRef.observeEventType(.ChildChanged, withBlock: {
         //    snap in

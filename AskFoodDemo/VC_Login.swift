@@ -100,6 +100,14 @@ class VC_Login: UIViewController, UITextFieldDelegate {
                 alert.addButton("进入Ask Food", action: {
                     _ in
                     myRootRef = myRootRef.childByAppendingPath("User").childByAppendingPath(authData.uid)
+                    let currentRef = myRootRef.childByAppendingPath(currentChat.dateForm("yyMMdd"))
+                    currentRef.observeSingleEventOfType(.Value, withBlock: {
+                        snap in
+                        if snap.hasChildren() != true
+                        {
+                            currentRef.setValue([String(TimeDur.Morning): ["isAsked" : false,"contextTag": ""],String(TimeDur.Noon): ["isAsked" : false,"contextTag": ""],String(TimeDur.Night): ["isAsked" : false,"contextTag": ""],"EER": 0,"PRO": 0,"Vc": 0])
+                        }
+                    })
                     self.performSegueWithIdentifier("s1", sender: nil)
                 })
                 alert.showSuccess("登录成功", subTitle: "请享受美好的一天吧")

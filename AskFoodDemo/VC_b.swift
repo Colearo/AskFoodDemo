@@ -66,7 +66,7 @@ class VC_b: UIViewController ,UIScrollViewDelegate{
         let barChartDataSet = BarChartDataSet(yVals: dataEntries, label: "卡路里/kcal")
         let barChartData = BarChartData(xVals: dataPoints, dataSet: barChartDataSet)
         barChartDataSet.colors=[Color.white]
-        barChartDataSet.barSpace = 0.60
+        barChartDataSet.barSpace = 0.70
         barChartDataSet.valueTextColor = Color.white
         barChartView1.descriptionText=""
         
@@ -113,7 +113,7 @@ class VC_b: UIViewController ,UIScrollViewDelegate{
         let barChartDataSet = BarChartDataSet(yVals: dataEntries, label: "蛋白质/g")
         let barChartData = BarChartData(xVals: dataPoints, dataSet: barChartDataSet)
         barChartDataSet.colors=[Color.white]
-        barChartDataSet.barSpace = 0.60
+        barChartDataSet.barSpace = 0.70
         barChartDataSet.valueTextColor = Color.white
         barChartView2.descriptionText=""
         barChartView2.xAxis.labelPosition = .Bottom
